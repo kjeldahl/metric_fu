@@ -68,11 +68,10 @@ module MetricFu
       end
       
       def link_to_filename(name, line = nil)
-        filename = File.expand_path(name)
-        if PLATFORM['darwin']
-          %{<a href="txmt://open/?url=file://#{filename}&line=#{line}">#{name}:#{line}</a>}
+        if MetricFu.run_by_cruise_control?
+          cc_link_to_filename(name, line)
         else
-          %{<a href="file://#{filename}">#{name}:#{line}</a>}
+          system_link_to_filename(name, line)
         end
       end
       
@@ -80,6 +79,25 @@ module MetricFu
         return first_value if iteration % 2 == 0
         return second_value
       end      
+      
+      private
+      def cc_link_to_filename(name, line = nil)
+        if MetricFu.configuration.general[:url_prefix]
+          MetricFu.configuration.general[:url_prefix] += '/' unless MetricFu.configuration.general[:url_prefix] =~ /\/$/
+          %{<a href="#{MetricFu.configuration.general[:url_prefix]}#{name}?line=#{line}##{line}">#{name}</a>}
+        else
+          %{"#{name}"} # No link for cruise control without a prefix
+        end
+      end 
+      
+      def system_link_to_filename(name, line = nil)
+        filename = File.expand_path(name)
+        if PLATFORM['darwin']
+          %{<a href="txmt://open/?url=file://#{filename}&line=#{line}">#{name}</a>}
+        else
+          %{<a href="file://#{filename}">#{name}</a>}
+        end
+      end
     end
   end
   
@@ -110,7 +128,7 @@ module MetricFu
     end
 
     def open_in_browser?
-      PLATFORM['darwin'] && !ENV['CC_BUILD_ARTIFACTS']
+      configuration.general[:open_in_browser] && PLATFORM['darwin'] && !run_by_cruise_control?
     end
     
     def saikuro
@@ -125,10 +143,14 @@ module MetricFu
       configuration.roodi
     end
 
+    def run_by_cruise_control?
+      !!ENV['CC_BUILD_ARTIFACTS']
+    end
+
   end
   
   class Configuration
-    attr_accessor :churn, :coverage, :flay, :flog, :metrics, :reek, :roodi, :saikuro
+    attr_accessor :churn, :coverage, :flay, :flog, :metrics, :reek, :roodi, :saikuro, :general
     def initialize
       raise "Use config.churn instead of MetricFu::CHURN_OPTIONS" if defined? ::MetricFu::CHURN_OPTIONS
       raise "Use config.flog[:dirs_to_flog] instead of MetricFu::DIRECTORIES_TO_FLOG" if defined? ::MetricFu::DIRECTORIES_TO_FLOG
@@ -141,6 +163,7 @@ module MetricFu
     end
     
     def reset
+      @general  = { :open_in_browser => true }
       @churn    =  {}
       @coverage = { :test_files => ['test/**/*_test.rb', 'spec/**/*_spec.rb'],
                     :rcov_opts => ["--sort coverage", "--html", "--rails", "--exclude /gems/,/Library/,spec"] }

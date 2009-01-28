@@ -54,4 +54,27 @@ describe MetricFu::Base::Generator do
     end
   end
 
+  describe "link_to_filename", "when run_by_cruise_control and a url_prefix is specfied" do
+    before(:each) do
+      @generator = MetricFu::Base::Generator.new
+      MetricFu.should_receive(:run_by_cruise_control?).at_least(1).and_return(true)
+    end
+
+    it "should return a link using the prefix" do
+      MetricFu::Configuration.run do |config|
+        config.general  = { :open_in_browser => true, :url_prefix => 'prefix' }
+      end
+
+      link = @generator.link_to_filename("app/model/foo.rb", 23)
+      link.should == %{<a href="prefix/app/model/foo.rb?line=23#23">app/model/foo.rb</a>}
+    end
+    it "should return a link using the prefix even if the prefix ends with /" do
+      MetricFu::Configuration.run do |config|
+        config.general  = { :open_in_browser => true, :url_prefix => 'prefix/' }
+      end
+
+      link = @generator.link_to_filename("app/model/foo.rb", 23)
+      link.should == %{<a href="prefix/app/model/foo.rb?line=23#23">app/model/foo.rb</a>}
+    end
+  end
 end

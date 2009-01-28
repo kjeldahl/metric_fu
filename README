@@ -64,6 +64,9 @@ MetricFu::Configuration.run do |config|
   config.flog     = { :dirs_to_flog => ['cms/app', 'cms/lib']  }
   config.flay     = { :dirs_to_flay => ['cms/app', 'cms/lib']  }  
   config.saikuro  = { "--warn_cyclo" => "3", "--error_cyclo" => "4" }
+  # open_in_browser only work on OSX
+  # urlprefix is used to prepend to file urls when MetricsFu is run by cruise control
+  config.general  = { :open_in_browser => true, :url_prefix => 'http://cruisecontrol.server/projects/code/my_project' }
 end
 
 
