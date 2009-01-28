@@ -16,7 +16,7 @@
 		</tr>
 		<% @matches.each_with_index do |match, count| %>
   		<tr class='<%= cycle("light", "dark", count) %>'>
-  		  <td><%= match.first %></td>
+  		  <td><%= @filenames[count] ? link_to_filename(@filenames[count]) : match.first %></td>
   		  <td>
   			  <% match[1..-1].each do |line| %>
   			  <%= line %><br>
