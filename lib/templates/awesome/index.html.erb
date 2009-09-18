@@ -4,13 +4,13 @@
   <li class='even failure'><a href="churn.html">Churn</a></li>
 <% end %>
 <% if @flay %>
-  <li class='even failure'><a href="flay.html">Flay</a></li>
+  <li class='even failure'><a href="flay.html">Flay <span class='totals'><%= @flay[:total_score] %></span></a></li>
 <% end %>
 <% if @flog %>
-  <li class='even failure'><a href="flog.html">Flog</a></li>
+  <li class='even failure'><a href="flog.html">Flog <span class='totals'><%= @flog[:total]%> / <%= @flog[:average]%></span></a></li>
 <% end %>
 <% if @rcov %>
-  <li class='even failure'><a href="rcov.html">Rcov</a></li>
+  <li class='even failure'><a href="rcov.html">Rcov <span class='totals'><%= @rcov[:global_percent_run] %>%</span></a> </li>
 <% end %>
 <% if @reek %>
   <li class='even failure'><a href="reek.html">Reek</a></li>
@@ -22,7 +22,7 @@
   <li class='even failure'><a href="saikuro.html">Saikuro</a></li>
 <% end %>
 <% if @stats %>
-  <li class='even failure'><a href="stats.html">Stats</a></li>
+  <li class='even failure'><a href="stats.html">Stats Code <span class='totals'><%=@stats[:codeLOC]%> lines</span></a></li>
 <% end %>
 </ul>
 <p>Generated on <%= Time.now.localtime %></p>	
