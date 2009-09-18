@@ -2,7 +2,8 @@ class AwesomeTemplate < MetricFu::Template
 
   def write
     # Getting rid of the crap before and after the project name from integrity
-    @name = File.basename(Dir.pwd).gsub(/^\w+-|-\w+$/, "")
+    dir = MetricFu.configuration.is_cruise_control_rb? ? File.join(Dir.pwd, '..') : Dir.pwd
+    @name =  File.basename(File.expand_path(dir)).gsub(/^\w+-|-\w+$/, "")
 
     report.each_pair do |section, contents|
       if template_exists?(section)
